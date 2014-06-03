@@ -28,7 +28,7 @@ This is a subset of publishing-tools created for Michas-Books on www.michas-ausf
 - to generate pdfs
    - wkhtmltopdf-0.9.9
    - optional wkhtmltopdf-0.11
-   - optional firefox + www.github.com/dat-micha/matcmdprinting
+   - optional firefox + https://github.com/das-praktische-schreinerlein/Mat-CmdPrinting
 - to convert pdfs
    - optional FreePDF 4.12
    - optional ghostScript 9.07
