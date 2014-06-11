@@ -4,7 +4,7 @@ mat-publishingtools
 # Desc
 This is a subset of publishing-tools created for Michas-Books on www.michas-ausflugstipps.de/portal-bucherstellung.html
 
-1. PDF-tools for converting, merge, trim and so on
+1. PDF-tools for converting, merging, trimming and so on
 2. batchfiles for support
 3. batchfiles for generating a book with pagenum and TOC from different webpages
 
@@ -32,7 +32,6 @@ This is a subset of publishing-tools created for Michas-Books on www.michas-ausf
 - to convert pdfs
    - optional FreePDF 4.12
    - optional ghostScript 9.07
-
 
 # Install
 - save the project to 
@@ -65,6 +64,10 @@ mvn org.apache.maven.plugins:maven-assembly-plugin:assembly
 cd d:\public_projects\MatPublishingTools
 src\test\example\buch-example.bat
 ```
+
+# Thanks to
+- https://github.com/itext/itextpdf
+- https://github.com/wkhtmltopdf/wkhtmltopdf 
 
 # License
 ```
