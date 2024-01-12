@@ -69,6 +69,8 @@ goto finish
 echo usage: %0 TYPE URL FORCE(0/1) ID FILENAME [VERSION=Webkit(default)/Firefox]
 echo save URL with Webkit or firefox as Pdf/Image to FILENAME.
 echo if cachefile exists use that 
+exit /B 1
 
 :finish
+exit /B 0
 

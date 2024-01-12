@@ -24,3 +24,5 @@ set PDFADDPAGENUM=java -cp %CP% %JAVAOPTIONS% de.mat.utils.pdftools.PdfAddPageNu
 set PDFRESIZE=java -cp %CP% %JAVAOPTIONS% de.mat.utils.pdftools.PdfResize
 set PDFSORT4PRINT=java -cp %CP% %JAVAOPTIONS% de.mat.utils.pdftools.PdfSort4Print
 
+:finish
+exit /B 0

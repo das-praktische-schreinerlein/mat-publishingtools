@@ -1,0 +1,13 @@
+{
+  "name": "matpublishingtools",
+  "version": "1.0.0",
+  "description": "MatPublishingTools",
+  "scripts": {
+    "noop": "npm version"
+  },
+  "dependencies": {
+    "minimist": "1.2.8",
+    "puppeteer": "18.0.5"
+  },
+  "devDependencies": {}
+}
