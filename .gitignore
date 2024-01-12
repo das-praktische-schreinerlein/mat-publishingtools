@@ -1,1 +1,4 @@
-/.settings
+.idea
+.settings
+node_modules
+target
