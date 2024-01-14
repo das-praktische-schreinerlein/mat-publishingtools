@@ -55,22 +55,29 @@ puppeteer.launch({
     return page.pdf({format: 'a4'});
 }).then(function(pdf) {
     console.log('save pdf', fileName);
-    fs.writeFile(fileName, pdf, function (err,data) {
-        if (err) {
-            return Promise.reject(err);
-        }
+    return new Promise(function(resolve, reject) {
+        fs.writeFile(fileName, pdf, function (err, data) {
+            if (err) {
+                reject(err);
+                return;
+            }
 
-        return Promise.resolve(fileName);
+            resolve(fileName);
+            return;
+        });
     });
 }).then(function(file) {
     console.log('close browser');
     return browser.close();
+}).then(value => {
+    console.log('DONE - command finished:', value, argv);
+    process.exit(0);
 }).catch(function(reason) {
-    console.error('error while rendering', reason);
+    console.error('ERROR - command failed:', reason, argv);
     if (browser) {
-        return browser.close();
+        browser.close();
     }
 
-    return Promise.reject(reason);
+    process.exit(-1);
 });
 
