@@ -44,9 +44,8 @@ call %CONTENTLOADER% page http://www.google.de/ %FORCEUPDATE% google %FILEBASE%-
 :merge
 rem merge the files from buch-%FILEBASE%.lst
 del %OUTDIR%buch-%FILEBASE%.pdf
-%PDFMERGE% %OUTDIR%buch-%FILEBASE%.pdf -t -f %EXAMPLEBASEPATH%\buch-%FILEBASE%.lst > %EXAMPLEBASEPATH%\buch-%FILEBASE%-toc.draft
-type %EXAMPLEBASEPATH%\toc-header.html %EXAMPLEBASEPATH%\buch-%FILEBASE%-toc.draft  %EXAMPLEBASEPATH%\toc-footer.html >  %EXAMPLEBASEPATH%\buch-%FILEBASE%-toc.html
- 
+%PDFMERGE% %OUTDIR%buch-%FILEBASE%.pdf -t -f %EXAMPLEBASEPATH%\buch-%FILEBASE%.lst -e %EXAMPLEBASEPATH%\buch-%FILEBASE%-toc.html --toctemplate %EXAMPLEBASEPATH%\toc-template.html
+
 :pagenum
 rem add pagenum to pdf
 del %OUTDIR%buch-%FILEBASE%-pagenum.pdf

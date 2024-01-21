@@ -31,6 +31,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.PrintWriter;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -120,10 +121,15 @@ public class PdfMerge extends CmdLineJob {
         flgTrim.setRequired(false);
         availiableCmdLineOptions.addOption(flgTrim);
 
-        Option exportToc = new Option("e", "exportTOC", true,
+        Option exportToc = new Option("e", "exporttoc", true,
                 "export TOC-file");
         exportToc.setRequired(false);
         availiableCmdLineOptions.addOption(exportToc);
+
+        Option tocTemplate = new Option("", "toctemplate", true,
+                "toc-template");
+        tocTemplate.setRequired(false);
+        availiableCmdLineOptions.addOption(tocTemplate);
 
         return availiableCmdLineOptions;
     }
@@ -152,8 +158,17 @@ public class PdfMerge extends CmdLineJob {
         // merge pdfs
         mergePdfs(lstBookMarks, fileNew, this.cmdLine.hasOption("t"));
         
-        // print html to STDOUT
+        // create toc
         String html = showBookMarksAsHtml(lstBookMarks);
+
+        // parse toc-template
+        String tocTemplateFile = this.cmdLine.getOptionValue("toctemplate", null);
+        if (tocTemplateFile != null && !tocTemplateFile.trim().isEmpty()) {
+            html = String.join("\n", Files.readAllLines(new File(tocTemplateFile).toPath()))
+                    .replace("{{TOC}}", html);
+        }
+
+        // export toc
         String exportTocFile = this.cmdLine.getOptionValue("e", null);
         if (exportTocFile != null && !exportTocFile.trim().isEmpty()) {
             try (PrintWriter out = new PrintWriter(exportTocFile)) {
@@ -161,6 +176,7 @@ public class PdfMerge extends CmdLineJob {
             }
         }
 
+        // print toc
         System.out.println(html);
     }
 

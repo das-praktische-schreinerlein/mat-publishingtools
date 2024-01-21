@@ -20,10 +20,11 @@ if (!destFilename || files.length < 1) {
 var bookmarkFile = argv['bookmarkfile'];
 var trim = argv['trim'];
 var tocfile = argv['tocfile'];
+var toctemplate = argv['toctemplate'];
 var debug = argv['debug-javascript'] || argv['debug'] || false;
 if (debug) {
-    console.log('START - merge pfs destFilename/bookmarkFile/tocfile/trim/files:',
-        destFilename, bookmarkFile, tocfile, trim, files);
+    console.log('START - merge pfs destFilename/bookmarkFile/tocfile/toctemplate/trim/files:',
+        destFilename, bookmarkFile, tocfile, toctemplate, trim, files);
 }
 
 var command = 'java';
@@ -42,6 +43,9 @@ if (bookmarkFile) {
 }
 if (tocfile) {
     commandArgs.push('-e', tocfile);
+}
+if (toctemplate) {
+    commandArgs.push('--toctemplate', toctemplate);
 }
 if (trim) {
     commandArgs.push('-t');
@@ -62,9 +66,7 @@ var stderrHandler = function (buffer) {
         return;
     }
 
-    if (debug) {
-        console.error(buffer.toString());
-    }
+    console.error(buffer.toString());
 };
 
 

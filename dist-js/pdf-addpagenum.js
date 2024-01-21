@@ -51,9 +51,7 @@ var stderrHandler = function (buffer) {
         return;
     }
 
-    if (debug) {
-        console.error(buffer.toString());
-    }
+    console.error(buffer.toString());
 };
 
 return new Promise(function (resolve, reject) {
