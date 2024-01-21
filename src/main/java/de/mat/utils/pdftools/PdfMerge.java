@@ -17,10 +17,20 @@
  */
 package de.mat.utils.pdftools;
 
+import com.itextpdf.text.Document;
+import com.itextpdf.text.pdf.PdfCopy;
+import com.itextpdf.text.pdf.PdfReader;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.log4j.Logger;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -29,16 +39,6 @@ import java.util.Map;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.log4j.Logger;
-
-import com.itextpdf.text.Document;
-import com.itextpdf.text.pdf.PdfCopy;
-import com.itextpdf.text.pdf.PdfReader;
 
 /**
  * <h4>FeatureDomain:</h4>
@@ -91,7 +91,7 @@ public class PdfMerge extends CmdLineJob {
         HelpFormatter formatter = new HelpFormatter();
         formatter.printHelp(this.getJobName() + " DestPdfFile [SrcPdfFile1]... [SrcPdfFileN]",
                         "Desc: merge all SrcPdfFile1-N or the files from Option filelist to DestPdfFile."
-                        + " If option trim is set -> trim all empty pages. Asresult a htmlTOC will print.",
+                        + " If option trim is set -> trim all empty pages. As result a htmlTOC will print.",
                         this.availiableCmdLineOptions,
                         "");
     }
@@ -119,7 +119,12 @@ public class PdfMerge extends CmdLineJob {
         "Trim empty pages");
         flgTrim.setRequired(false);
         availiableCmdLineOptions.addOption(flgTrim);
-        
+
+        Option exportToc = new Option("e", "exportTOC", true,
+                "export TOC-file");
+        exportToc.setRequired(false);
+        availiableCmdLineOptions.addOption(exportToc);
+
         return availiableCmdLineOptions;
     }
 
@@ -128,7 +133,7 @@ public class PdfMerge extends CmdLineJob {
         String fileNew = this.cmdLine.getArgs()[0];
 
         String listFile = this.cmdLine.getOptionValue("f", null);
-        List<Bookmark> lstBookMarks = new ArrayList<Bookmark>();
+        List<Bookmark> lstBookMarks = new ArrayList<>();
         if (listFile != null) {
             // read bookmarks from file
             lstBookMarks = parseBookMarksFromFile(listFile);
@@ -137,7 +142,8 @@ public class PdfMerge extends CmdLineJob {
             for (int zaehler = 1; zaehler < this.cmdLine.getArgs().length; zaehler++) {
                 // setup Bookmark
                 Bookmark mpBookMark = new Bookmark();
-                mpBookMark.put("SRC", this.cmdLine.getArgs()[zaehler]);
+                String fileName = this.cmdLine.getArgs()[zaehler];
+                mpBookMark.put("SRC", fileName);
                 mpBookMark.put("NAME", this.cmdLine.getArgs()[zaehler]);
                 lstBookMarks.add(mpBookMark);
             }
@@ -147,7 +153,15 @@ public class PdfMerge extends CmdLineJob {
         mergePdfs(lstBookMarks, fileNew, this.cmdLine.hasOption("t"));
         
         // print html to STDOUT
-        System.out.println(showBookMarksAsHtml(lstBookMarks));
+        String html = showBookMarksAsHtml(lstBookMarks);
+        String exportTocFile = this.cmdLine.getOptionValue("e", null);
+        if (exportTocFile != null && !exportTocFile.trim().isEmpty()) {
+            try (PrintWriter out = new PrintWriter(exportTocFile)) {
+                out.println(html);
+            }
+        }
+
+        System.out.println(html);
     }
 
     /**
@@ -182,7 +196,7 @@ public class PdfMerge extends CmdLineJob {
     public static void mergePdfs(List<Bookmark> lstBookMarks, String fileNew, 
                                  boolean flgTrim) throws Exception {
         // FirstFile
-        Map curBookMark = (Map)lstBookMarks.get(0);
+        Map curBookMark = lstBookMarks.get(0);
         String curFileName = (String)curBookMark.get("SRC");
 
         // Neues Dokument anlegen aus 1. Quelldokument anlegen
@@ -231,9 +245,11 @@ public class PdfMerge extends CmdLineJob {
      */
     public static List<Bookmark> parseBookMarksFromFile(String listFile) throws Throwable {
         // BookMarkliste aus Datei lesen
-        List<Bookmark> lstBookMarks = new ArrayList<Bookmark>();
+        List<Bookmark> lstBookMarks = new ArrayList<>();
         String fileContent = readFromFile(listFile);
         String[] lines = fileContent.split("\n");
+
+        String baseDir = (new File(listFile)).getParentFile().getAbsolutePath();
         if (lines != null) {
             // alle Zeilen durchlaufen
             for (int zaehler = 0; zaehler < lines.length; zaehler++) {
@@ -257,6 +273,14 @@ public class PdfMerge extends CmdLineJob {
                         String fileName =  match.group(1);
                         fileName = fileName.replaceAll("\\+", "_");
                         fileName = fileName.replaceAll(">", "_");
+
+                        if (!new File(fileName).exists()) {
+                            if (fileName.matches("^[a-zA-Z\\.0-9]{1}.*")) {
+                                fileName = baseDir + '/' + fileName;
+                                System.err.println("remap file with basedir: " + baseDir + " fileName: " + fileName);
+                            }
+                        }
+
                         mpBookMark.put("SRC", fileName);
                         mpBookMark.put("NAME", match.group(2));
                         mpBookMark.put("TYPE", match.group(3));

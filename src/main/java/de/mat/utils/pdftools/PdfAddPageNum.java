@@ -17,19 +17,21 @@
  */
 package de.mat.utils.pdftools;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.log4j.Logger;
-
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfStamper;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.log4j.Logger;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 /**
  * <h4>FeatureDomain:</h4>
@@ -160,14 +162,15 @@ public class PdfAddPageNum extends CmdLineJob {
                               int pageOffset) throws Exception {
         PdfReader reader = null;
         PdfStamper stamper = null;
+        File tmpFile = File.createTempFile("pdfaddpagenum", "pdf");
+        tmpFile.deleteOnExit();
         try {
             // open files
             reader = new PdfReader(srcFile);
-            stamper = new PdfStamper(reader, new FileOutputStream(destFile));
-            
+            stamper = new PdfStamper(reader, Files.newOutputStream(tmpFile.toPath()));
+
             // add pagenum
             addPageNumber(reader, stamper, pageOffset);
-
         } catch (Exception ex) {
             // return Exception
             throw new Exception(ex);
@@ -179,6 +182,8 @@ public class PdfAddPageNum extends CmdLineJob {
             if (reader != null) {
                 reader.close();
             }
+
+            Files.copy(tmpFile.toPath(), new File(destFile).toPath(), REPLACE_EXISTING);
         }
         
     }

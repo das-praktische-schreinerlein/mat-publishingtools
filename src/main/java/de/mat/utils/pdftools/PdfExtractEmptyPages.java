@@ -5,7 +5,7 @@
  * <h4>FeatureDescription:</h4>
  *     software for publishing<br>
  *     pdftools
- * 
+ *
  * @author Michael Schreiner <michael.schreiner@your-it-fellow.de>
  * @category collaboration
  * @copyright Copyright (c) 2011-2014, Michael Schreiner
@@ -17,13 +17,6 @@
  */
 package de.mat.utils.pdftools;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.log4j.Logger;
-
 import com.itextpdf.text.Document;
 import com.itextpdf.text.pdf.PdfCopy;
 import com.itextpdf.text.pdf.PdfDictionary;
@@ -31,13 +24,19 @@ import com.itextpdf.text.pdf.PdfImportedPage;
 import com.itextpdf.text.pdf.PdfName;
 import com.itextpdf.text.pdf.PdfObject;
 import com.itextpdf.text.pdf.PdfReader;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.log4j.Logger;
+
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 
 /**
  * <h4>FeatureDomain:</h4>
  *     Publishing
  * <h4>FeatureDescription:</h4>
  *     extract empty pages
- * 
+ *
  * @package de.mat.utils.pdftools
  * @author Michael Schreiner <michael.schreiner@your-it-fellow.de>
  * @category Publishing
@@ -51,7 +50,10 @@ public class PdfExtractEmptyPages extends CmdLineJob {
     }
 
     // identify empty pages, set minsize
-    public static int blankPdfsize = 15635; // siehe \tmp\buch\meine-3000er-076-tour-paternkofel_-_paternkofelsteig-dontshowtourentalort.pdf alt:1400;
+    //public static int blankPdfsize_v4 = 15635; // siehe \tmp\buch\meine-3000er-076-tour-paternkofel_-_paternkofelsteig-dontshowtourentalort.pdf alt:1400;
+    //public static int blankPdfsize_v4 = 1800; // siehe D:\tmp\buch\michas-touren-000-static-2003-einleitung.pdf
+    public static int blankPdfsize_v4 = 4387; // meine-3000erii-007-tour-kranzbach_-_ueber_bergwiesen_nach_ellmau_und_retour.pdf
+
     public static int blankPdfsize_v5 = 800;
 
     // Logger
@@ -82,7 +84,7 @@ public class PdfExtractEmptyPages extends CmdLineJob {
         String srcFile = this.cmdLine.getArgs()[0];
         String destFile = this.cmdLine.getArgs()[1];
         String emptyFile = this.cmdLine.getArgs()[1];
-        
+
         // start
         PdfExtractEmptyPages.removeBlankPdfPages(srcFile, destFile, emptyFile);
     }
@@ -165,7 +167,7 @@ public class PdfExtractEmptyPages extends CmdLineJob {
         PdfCopy writerTrimmed, PdfCopy writerRemoved, boolean flgTrim) throws Exception {
         PdfImportedPage page = null;
         int countTrimmedPages = 0;
-        
+
         //loop each page
         for (int i=1;i<=readerOrig.getNumberOfPages();i++) {
             boolean flgIsEmpty = true;
@@ -175,10 +177,10 @@ public class PdfExtractEmptyPages extends CmdLineJob {
 
             // every pdf-version has its own way :-(
             char version = readerOrig.getPdfVersion();
-            
+
             if (version == '3') {
                 // PDF-Version: 3
-                
+
                 // examine the resource dictionary for /Font or
                 // /XObject keys.  If either are present, they're almost
                 // certainly actually used on the page -> not blank.
@@ -190,15 +192,15 @@ public class PdfExtractEmptyPages extends CmdLineJob {
                     resDict = (PdfDictionary)PdfReader.getPdfObject(myObj);
                 }
                 if (resDict != null) {
-                    flgIsEmpty = resDict.get( PdfName.FONT ) == null 
+                    flgIsEmpty = resDict.get( PdfName.FONT ) == null
                                  && resDict.get( PdfName.XOBJECT ) == null
                                  ;
                     if (LOGGER.isInfoEnabled()) {
                         if (flgIsEmpty) {
-                            LOGGER.info("probably empty page "+i + " Version: 1." + version 
+                            LOGGER.info("probably empty page "+i + " Version: 1." + version
                                         + " FONT/XOBJECT found in File:" + origFileName);
                         } else {
-                            LOGGER.info("normal page "+i + " Version: 1." + version 
+                            LOGGER.info("normal page "+i + " Version: 1." + version
                                         + " no FONT/XOBJECT found in File:" + origFileName);
                         }
                     }
@@ -212,16 +214,16 @@ public class PdfExtractEmptyPages extends CmdLineJob {
                 ByteArrayOutputStream bs = new ByteArrayOutputStream();
                 // write the content to an output stream
                 bs.write(bContent);
-                
+
                 flgIsEmpty = true;
-                if (bs.size() > blankPdfsize) {
-                    if (LOGGER.isInfoEnabled()) 
-                        LOGGER.info("normal page "+i + " Version: 1." + version 
+                if (bs.size() > blankPdfsize_v4) {
+                    if (LOGGER.isInfoEnabled())
+                        LOGGER.info("normal page "+i + " Version: 1." + version
                             + " BS:" + bs.size() + " File:" + origFileName);
                     flgIsEmpty = false;
                 } else {
-                    if (LOGGER.isInfoEnabled()) 
-                        LOGGER.info("probably empty page "+i + " Version: 1." 
+                    if (LOGGER.isInfoEnabled())
+                        LOGGER.info("probably empty page "+i + " Version: 1."
                             + version + " BS:" + bs.size() + " File:" + origFileName);
                 }
             } else if (version == '5') {
@@ -233,30 +235,30 @@ public class PdfExtractEmptyPages extends CmdLineJob {
                 ByteArrayOutputStream bs = new ByteArrayOutputStream();
                 // write the content to an output stream
                 bs.write(bContent);
-                
+
                 flgIsEmpty = true;
                 if (bs.size() > blankPdfsize_v5) {
-                    if (LOGGER.isInfoEnabled()) 
-                        LOGGER.info("normal page "+i + " Version: 1." + version 
+                    if (LOGGER.isInfoEnabled())
+                        LOGGER.info("normal page "+i + " Version: 1." + version
                              + " BS:" + bs.size() + " File:" + origFileName);
                     flgIsEmpty = false;
                 } else {
-                    if (LOGGER.isInfoEnabled()) 
-                        LOGGER.info("probably empty page "+i + " Version: 1." 
+                    if (LOGGER.isInfoEnabled())
+                        LOGGER.info("probably empty page "+i + " Version: 1."
                              + version + " BS:" + bs.size() + " File:" + origFileName);
                 }
             }
 
             // add page to removed or trimmed document
             if (! flgIsEmpty || ! flgTrim) {
-                if (LOGGER.isInfoEnabled()) 
+                if (LOGGER.isInfoEnabled())
                     LOGGER.info("add page "+i);
                 page = writerTrimmed.getImportedPage(readerOrig, i);
                 writerTrimmed.addPage(page);
                 countTrimmedPages++;
             } else {
-                if (LOGGER.isInfoEnabled()) 
-                    LOGGER.info("skip page "+i + " Version: 1." + version 
+                if (LOGGER.isInfoEnabled())
+                    LOGGER.info("skip page "+i + " Version: 1." + version
                         + " File:" + origFileName);
                 if (writerRemoved != null) {
                     page = writerRemoved.getImportedPage(readerOrig, i);

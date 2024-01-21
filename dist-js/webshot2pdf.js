@@ -6,37 +6,50 @@ var fs = require('fs');
 var minimist = require('minimist');
 
 var argv = minimist(process.argv.slice(2));
+if (argv['_'].length < 2) {
+    console.error('ERROR - require destFilename startPageNum', argv);
+    process.exit(-1);
+}
 
-var debug = argv['debug-javascript'] || argv['debug'] || false;
-var width = argv['width'] || 1210;
-var delay = argv['javascript-delay'] || argv['delay']  || 6000;
 var url = argv['_'][0];
 var fileName = argv['_'][1];
-
-console.log('url' , url, ' fileName', fileName, '--width', width, '--delay', delay);
 if (!url || !fileName) {
     console.error('ERROR - require url AND filename', argv);
     process.exit(-1);
 }
 
-// --crop-w 600 --crop-x 4
+var width = argv['width'] || 1210;
+var delay = argv['javascript-delay'] || argv['delay']  || 10000;
+var debug = argv['debug-javascript'] || argv['debug'] || false;
+if (debug) {
+    console.log('START - load url/fileName/width/delay:', url, fileName, width, delay);
+}
 
 var browser;
 var page;
-puppeteer.launch({
+var windowDimension = ['--window-size=' + width + ',1080'];
+var puppeteerOptions = {
     dumpio: true,
     headless: true,
-    args: ['--window-size=' + width + ',1080'],
+    args: windowDimension,
     defaultViewport: {
         width: width,
         height: 1080
     }
-}).then(function(result) {
-    console.log('new page');
+};
+
+return puppeteer.launch(puppeteerOptions).then(function(result) {
+    if (debug) {
+        console.log('new page w/h: ', windowDimension);
+    }
+
     browser = result;
     return browser.newPage();
 }).then(function(result) {
-    console.log('load url', url);
+    if (debug) {
+        console.log('load url:', url);
+    }
+
     page = result;
     return page.setViewport({
         width: width,
@@ -47,14 +60,22 @@ puppeteer.launch({
         });
     });
 }).then(function() {
-    console.log('wait till all rendered', url);
+    if (debug) {
+        console.log('wait till all rendered:', url, delay);
+    }
+
     return page.waitForTimeout(delay);
 }).then(function() {
-    console.log('generate pdf', url);
+    if (debug) {
+        console.log('generate pdf:', url);
+    }
 
     return page.pdf({format: 'a4'});
 }).then(function(pdf) {
-    console.log('save pdf', fileName);
+    if (debug) {
+        console.log('save pdf:', fileName, url);
+    }
+
     return new Promise(function(resolve, reject) {
         fs.writeFile(fileName, pdf, function (err, data) {
             if (err) {
@@ -67,10 +88,16 @@ puppeteer.launch({
         });
     });
 }).then(function(file) {
-    console.log('close browser');
+    if (debug) {
+        console.log('close browser');
+    }
+
     return browser.close();
 }).then(value => {
-    console.log('DONE - command finished:', value, argv);
+    if (debug) {
+        console.log('DONE - command finished:', value, argv);
+    }
+
     process.exit(0);
 }).catch(function(reason) {
     console.error('ERROR - command failed:', reason, argv);
