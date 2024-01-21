@@ -27,7 +27,7 @@ var projectDir = __dirname;
 var command = 'java';
 var commandArgs = [
     '-cp', projectDir + '/../target/matpublishingtools-1.0.0-SNAPSHOT-jar-with-dependencies.jar',
-    '-Xmx512m',
+    '-Xmx8096m',
     '-Xms128m',
     '-Dlog4j.configuration=file:' + projectDir + '/../config/log4j.properties',
     'de.mat.utils.pdftools.PdfAddPageNum',

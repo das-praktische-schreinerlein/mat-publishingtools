@@ -5,19 +5,19 @@ var minimist = require('minimist');
 var {spawn} = require('child_process');
 
 var argv = minimist(process.argv.slice(2));
-if (argv['_'].length < 2) {
-    console.error('ERROR - require destFilename files', argv);
+if (argv['_'].length < 1) {
+    console.error('ERROR - require destFilename', argv);
     process.exit(-1);
 }
 
 var destFilename = argv['_'][0];
 var files = argv['_'].slice(1);
-if (!destFilename || files.length < 1) {
-    console.error('ERROR - require destFilename files', argv);
+var bookmarkFile = argv['bookmarkfile'];
+if (!destFilename || (files.length < 1 && !bookmarkFile)) {
+    console.error('ERROR - require destFilename AND files or --bookmarkfile', argv);
     process.exit(-1);
 }
 
-var bookmarkFile = argv['bookmarkfile'];
 var trim = argv['trim'];
 var tocfile = argv['tocfile'];
 var toctemplate = argv['toctemplate'];
@@ -31,15 +31,17 @@ var command = 'java';
 var projectDir = __dirname;
 var commandArgs = [
     '-cp', projectDir + '/../target/matpublishingtools-1.0.0-SNAPSHOT-jar-with-dependencies.jar',
-    '-Xmx512m',
+    '-Xmx8096m',
     '-Xms128m',
     '-Dlog4j.configuration=file:' + projectDir + '/../config/log4j.properties',
     'de.mat.utils.pdftools.PdfMerge',
-    destFilename,
-].concat(files);
+    destFilename
+];
 
 if (bookmarkFile) {
     commandArgs.push('-f', bookmarkFile);
+} else {
+    commandArgs = commandArgs.concat(files);
 }
 if (tocfile) {
     commandArgs.push('-e', tocfile);
