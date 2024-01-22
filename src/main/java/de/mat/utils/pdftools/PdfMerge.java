@@ -358,9 +358,9 @@ public class PdfMerge extends CmdLineJob {
                 lineStyle += " bookmark_line_" + curType;
             }
             res += "<div class='" + lineStyle + "'>"
-                + "<div class='bookmark_file'>" + curFileName + "</div>"
-                + "<div class='bookmark_name'>" + curName + "</div>"
-                + "<div class='bookmark_page'>" + curPage + "</div>"
+                + "<div class='bookmark_file'><a href=\"" + curFileName + "\">" + curFileName + "</a></div>"
+                + "<div class='bookmark_name'><a href=\"" + curFileName + "\">" + curName + "</a></div>"
+                + "<div class='bookmark_page'><a href=\"" + curFileName + "\">" + curPage + "</a></div>"
                 + "</div>\n";
         }
         
