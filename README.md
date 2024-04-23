@@ -13,11 +13,11 @@ This is a subset of publishing-tools created for Michas-Books on www.michas-ausf
 - [ ] use and optimize it :-)
 
 # History and milestones
-- 2023
+- 1.0.0 (2024-04-23) 
    - added webshot2pdf
    - added nodejs-wrapper for pdf-tools
    - improved pdf-tools (added option to save toc to file, remap relative filenames with bookmarkpath)
-- 2014 
+- 0.1.0 (2014) 
    - prepared the tools for going public (documentation...) 
    - separated the public-tools
 - 2011

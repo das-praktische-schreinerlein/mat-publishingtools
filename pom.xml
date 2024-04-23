@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.mat</groupId>
     <artifactId>matpublishingtools</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>matpublishingtools</name>
     <url>http://maven.apache.org</url>
     <packaging>jar</packaging>
